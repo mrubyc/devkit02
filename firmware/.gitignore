@@ -1,0 +1,21 @@
+# Executables
+
+# Temporary files
+*.o
+*.obj
+*.log
+
+# Work files
+PSoC5LP_Firm.cywrk.*
+
+Design01.cydsn/CortexM3
+Design01.cydsn/Export
+Design01.cydsn/Generated_Source
+Design01.cydsn/codegentemp
+
+Design01.cydsn/Design01.cyprj.*
+Design01.cydsn/Design01.cycdx
+Design01.cydsn/Design01.cyfit
+Design01.cydsn/Design01.rpt
+Design01.cydsn/Design01.svd
+Design01.cydsn/Design01_timing.html
