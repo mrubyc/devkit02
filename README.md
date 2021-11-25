@@ -8,6 +8,8 @@ ITOC (https://www.s-itoc.jp) で作成した mruby/c 開発リファレンスボ
 
 マイコンは、Cypress PSoC5LP (CY8C5888LTI-LP097) であり、同社製のキット CY8CKIT-059 のピギーバックしているだけなので、素の CY8CKIT-059 に書き込んでも使える。
 
+<img src="https://raw.githubusercontent.com/mrubyc/devkit02/main/img/devkit02_topimage.jpg" width=240 height=320>
+
 
 ## Related Link
 
