@@ -32,6 +32,6 @@ https://github.com/mrubyc/dev/blob/master/mrubyc_io_api.md
 
 ## LICENSE
 
-  Copyright (C) 2015-2019 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015-2021 Shimane IT Open-Innovation Center.
 
-  This file is distributed under BSD 3-Clause License.
+  All files in this repository are distributed under BSD 3-Clause License.
