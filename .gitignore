@@ -1,0 +1,6 @@
+# Temporary files
+*~
+*.bak
+
+# Mac
+.DS_Store

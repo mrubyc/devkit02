@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mrcp name="MS5637_Barometer">
+  <version>1.0</version>
+  <timestamp>2021-11-26T15:32:07</timestamp>
+  <files>
+    <file name="main.rb">
+      <type>2</type>
+      <editing>false</editing>
+      <mark/>
+    </file>
+  </files>
+</mrcp>

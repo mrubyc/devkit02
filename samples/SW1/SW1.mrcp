@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mrcp name="SW1">
+  <version>1.0</version>
+  <timestamp>2021-11-26T15:22:09</timestamp>
+  <files>
+    <file name="main.rb">
+      <type>2</type>
+      <editing>true</editing>
+      <mark/>
+    </file>
+  </files>
+</mrcp>

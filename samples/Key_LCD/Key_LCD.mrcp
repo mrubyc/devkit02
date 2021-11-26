@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mrcp name="Key_LCD">
+  <version>1.0</version>
+  <timestamp>2021-11-26T15:18:42</timestamp>
+  <files>
+    <file name="sample1.rb">
+      <type>2</type>
+      <editing>true</editing>
+      <mark/>
+    </file>
+  </files>
+</mrcp>

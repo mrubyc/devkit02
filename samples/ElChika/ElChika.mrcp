@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mrcp name="ElChika">
+  <version>1.0</version>
+  <timestamp>2021-11-26T15:18:23</timestamp>
+  <files>
+    <file name="debugprint.rb">
+      <type>2</type>
+      <editing>true</editing>
+      <mark/>
+    </file>
+    <file name="prog1.rb">
+      <type>2</type>
+      <editing>true</editing>
+      <mark/>
+    </file>
+  </files>
+</mrcp>
