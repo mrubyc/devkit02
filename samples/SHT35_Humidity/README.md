@@ -16,3 +16,5 @@ https://www.seeedstudio.com/Grove-I2C-High-Accuracy-Temp-Humi-Sensor-SHT35.html
 2. Reads about once every second.
 
 ## Demo
+
+https://user-images.githubusercontent.com/16683312/143819670-32196033-10c2-4766-b24c-af74a73a84d8.mp4
