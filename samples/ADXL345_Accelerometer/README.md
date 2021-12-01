@@ -25,4 +25,10 @@ Another sample program simply emulates a ball rolling on a plane.
 
 ## Demo
 
+main.rb
+
 https://user-images.githubusercontent.com/16683312/144192729-ab362cf6-4b65-4aec-a082-47165c4c2c3b.mp4
+
+main2.rb
+
+https://user-images.githubusercontent.com/16683312/144194505-38d72f12-8f72-45bc-8e72-b4f3f158f905.mp4
