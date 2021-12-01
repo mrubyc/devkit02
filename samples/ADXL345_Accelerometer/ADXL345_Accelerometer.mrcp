@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mrcp name="ADXL345_Accelerometer">
+  <version>1.0</version>
+  <timestamp>2021-11-30T16:35:43</timestamp>
+  <files>
+    <file name="main.rb">
+      <type>2</type>
+      <editing>true</editing>
+      <mark/>
+    </file>
+  </files>
+</mrcp>
