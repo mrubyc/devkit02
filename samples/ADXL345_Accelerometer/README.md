@@ -21,3 +21,8 @@ Set it on the breadboard and connect it to the glove connector with bulk wire.
 In one sample program, the measured value is represented by a bar that expands and contracts.
 
 Another sample program simply emulates a ball rolling on a plane.
+
+
+## Demo
+
+https://user-images.githubusercontent.com/16683312/144192729-ab362cf6-4b65-4aec-a082-47165c4c2c3b.mp4
