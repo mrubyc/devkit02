@@ -9,6 +9,8 @@ https://www.analog.com/en/products/adxl345.html
 
 https://akizukidenshi.com/catalog/g/gM-06724/
 
+<img src="https://raw.githubusercontent.com/mrubyc/devkit02/main/samples/ADXL345_Accelerometer/img/M-06724.jpg">
+
 Set it on the breadboard and connect it to the glove connector with bulk wire.
 
 
