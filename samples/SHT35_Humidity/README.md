@@ -17,4 +17,4 @@ https://www.seeedstudio.com/Grove-I2C-High-Accuracy-Temp-Humi-Sensor-SHT35.html
 
 ## Demo
 
-https://user-images.githubusercontent.com/16683312/143819670-32196033-10c2-4766-b24c-af74a73a84d8.mp4
+https://user-images.githubusercontent.com/16683312/144358638-40622327-b25a-4540-8126-f234bd6a9a64.mp4

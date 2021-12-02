@@ -16,3 +16,4 @@ LED1 turns on when SW1 is pressed and turns off when released.
 
 ## Demo
 
+https://user-images.githubusercontent.com/16683312/144358336-a081845e-5273-4b6f-854a-6fdbc0c1b663.mp4
