@@ -2,6 +2,8 @@
 
 10 Segment LED Display using MY9221 12-Channel LED Driver
 
+<img src="https://github.com/mrubyc/devkit02/raw/main/samples/GroveLEDBar/img/GroveLEDBar.jpg">
+
 https://www.seeedstudio.com/Grove-LED-Bar-v2-0.html
 
 
