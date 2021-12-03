@@ -4,6 +4,9 @@ Distance Measuring Sensor Unit.
 Measuring distance: 10 to 80 cm.  
 Analog output type.
 
+<img src="https://github.com/mrubyc/devkit02/raw/main/samples/GP2Y0A21YK_Distance/img/GP2Y0A21YK.jpg">
+
+https://global.sharp/products/device/lineup/selection/opto/haca/diagram.html
 
 ## Connect to the board.
 
