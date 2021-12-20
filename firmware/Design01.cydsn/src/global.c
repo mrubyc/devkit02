@@ -3,8 +3,8 @@
   Constant and global variables.
 
   <pre>
-  Copyright (C) 2015-2021 Kyushu Institute of Technology.
-  Copyright (C) 2015-2021 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015-2020 Kyushu Institute of Technology.
+  Copyright (C) 2015-2020 Shimane IT Open-Innovation Center.
 
   This file is distributed under BSD 3-Clause License.
 
@@ -170,6 +170,9 @@ void mrbc_global_clear_vm_id(void)
 
 
 #ifdef MRBC_DEBUG
+#include "class.h"
+#include "symbol.h"
+
 //================================================================
 /*! clear vm_id in global object for process terminated.
 */
@@ -179,26 +182,10 @@ void mrbc_global_debug_dump(void)
   mrbc_kv_iterator ite = mrbc_kv_iterator_new( &handle_const );
   while( mrbc_kv_i_has_next( &ite ) ) {
     mrbc_kv *kv = mrbc_kv_i_next( &ite );
-    const char *s = mrbc_symid_to_str(kv->sym_id);
 
-    if( s && '0' <= s[0] && s[0] <= '9' ) {
-      mrbc_sym id;
-      const char *s1, *s2;
-
-      id = (s[0]-'0') << 12 | (s[1]-'0') << 8 | (s[2]-'0') << 4 | (s[3]-'0');
-      s1 = mrbc_symid_to_str(id);
-      id = (s[4]-'0') << 12 | (s[5]-'0') << 8 | (s[6]-'0') << 4 | (s[7]-'0');
-      s2 = mrbc_symid_to_str(id);
-      console_printf(" %04x:%s (%s::%s) = ", kv->sym_id, s, s1, s2 );
-    } else {
-      console_printf(" %04x:%s = ", kv->sym_id, s );
-    }
+    console_printf(" %04x:%s = ", kv->sym_id, symid_to_str(kv->sym_id));
     mrbc_p_sub( &kv->value );
-    if( kv->value.tt < MRBC_TT_INC_DEC_THRESHOLD ) {
-      console_printf(" .tt=%d\n", kv->value.tt);
-    } else {
-      console_printf(" .tt=%d refcnt=%d\n", kv->value.tt, kv->value.obj->ref_count);
-    }
+    console_printf(" .tt=%d\n", kv->value.tt);
   }
 
   console_print("<< Global table dump. >>\n(s_id:identifier = value)\n");
@@ -208,11 +195,7 @@ void mrbc_global_debug_dump(void)
 
     console_printf(" %04x:%s = ", kv->sym_id, symid_to_str(kv->sym_id));
     mrbc_p_sub( &kv->value );
-    if( kv->value.tt < MRBC_TT_INC_DEC_THRESHOLD ) {
-      console_printf(" .tt=%d\n", kv->value.tt);
-    } else {
-      console_printf(" .tt=%d refcnt=%d\n", kv->value.tt, kv->value.obj->ref_count);
-    }
+    console_printf(" .tt=%d\n", kv->value.tt);
   }
 }
 

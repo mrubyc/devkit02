@@ -1,12 +1,13 @@
 /*! @file
   @brief
-  Class related functions.
+  mruby/c Object, Proc, Nil, False and True class and class specific functions.
 
   <pre>
-  Copyright (C) 2015-2021 Kyushu Institute of Technology.
-  Copyright (C) 2015-2021 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015-2020 Kyushu Institute of Technology.
+  Copyright (C) 2015-2020 Shimane IT Open-Innovation Center.
 
   This file is distributed under BSD 3-Clause License.
+
 
   </pre>
 */
@@ -14,10 +15,15 @@
 #ifndef MRBC_SRC_CLASS_H_
 #define MRBC_SRC_CLASS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /***** Feature test switches ************************************************/
+#include "vm_config.h"
+
 /***** System headers *******************************************************/
 /***** Local headers ********************************************************/
-#include "vm_config.h"
 #include "value.h"
 #include "keyvalue.h"
 
@@ -124,10 +130,6 @@ extern struct RClass *mrbc_class_typeerror;
 
 
 /***** Function prototypes **************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 mrbc_class *mrbc_define_class(struct VM *vm, const char *name, mrbc_class *super);
 mrbc_class *mrbc_define_builtin_class(const char *name, mrbc_class *super, const mrbc_sym *method_symbols, const mrbc_func_t *method_functions, int num_builtin_method);
 void mrbc_define_method(struct VM *vm, mrbc_class *cls, const char *name, mrbc_func_t cfunc);
@@ -142,7 +144,6 @@ mrbc_method *mrbc_find_method(mrbc_method *r_method, mrbc_class *cls, mrbc_sym s
 mrbc_class *mrbc_get_class_by_name(const char *name);
 mrbc_value mrbc_send(struct VM *vm, mrbc_value *v, int reg_ofs, mrbc_value *recv, const char *method_name, int argc, ...);
 void c_ineffect(struct VM *vm, mrbc_value v[], int argc);
-void mrbc_init_class(void);
 
 
 /***** Inline functions *****************************************************/

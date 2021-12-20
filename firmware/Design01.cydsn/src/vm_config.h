@@ -97,6 +97,4 @@
 
 // #define MRBC_NO_TIMER
 
-// #define MRBC_INT64
-
 #endif

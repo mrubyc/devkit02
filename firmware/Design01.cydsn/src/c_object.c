@@ -3,8 +3,8 @@
   Object, Proc, Nil, True and False class.
 
   <pre>
-  Copyright (C) 2015-2021 Kyushu Institute of Technology.
-  Copyright (C) 2015-2021 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015-2020 Kyushu Institute of Technology.
+  Copyright (C) 2015-2020 Shimane IT Open-Innovation Center.
 
   This file is distributed under BSD 3-Clause License.
 
@@ -26,10 +26,13 @@
 #include "vm.h"
 #include "class.h"
 #include "symbol.h"
+#include "load.h"
+#include "c_object.h"
 #include "c_string.h"
 #include "c_array.h"
 #include "c_hash.h"
 #include "console.h"
+
 #include "opcode.h"
 
 
@@ -45,16 +48,16 @@ static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value new_obj = mrbc_instance_new(vm, v->cls, 0);
 
-  char syms[]="____initialize";
-  mrbc_sym sym_id = str_to_symid(&syms[4]);
+  char syms[]="______initialize";
+  mrbc_sym sym_id = str_to_symid(&syms[6]);
   mrbc_method method;
 
   if( mrbc_find_method( &method, v->cls, sym_id ) == 0 ) {
     SET_RETURN(new_obj);
     return;
   }
-  uint16_to_bin( 1,(uint8_t*)&syms[0]);
-  uint16_to_bin(10,(uint8_t*)&syms[2]);
+  uint32_to_bin( 1,(uint8_t*)&syms[0]);
+  uint16_to_bin(10,(uint8_t*)&syms[4]);
 
   uint8_t code[] = {
     OP_SEND, 0, 0, argc,
@@ -274,32 +277,32 @@ static void c_object_puts(struct VM *vm, mrbc_value v[], int argc)
 
 //================================================================
 /*! (method) raise
- *    case 1. raise
- *    case 2. raise "param"
- *    case 3. raise Exception
- *    case 4. raise Exception, "param"
+ *    1. raise
+ *    2. raise "param"
+ *    3. raise Exception
+ *    4. raise Exception, "param"
  */
 static void c_object_raise(struct VM *vm, mrbc_value v[], int argc)
 {
   if( !vm->exc ){
     // raise exception
     if( argc == 0 ){
-      // case 1. raise
+      // 1. raise
       vm->exc = mrbc_class_runtimeerror;
       vm->exc_message = mrbc_nil_value();
     } else if( argc == 1 ){
       if( v[1].tt == MRBC_TT_CLASS ){
-        // case 3. raise Exception
-	      vm->exc = v[1].cls;
-	      vm->exc_message = mrbc_nil_value();
+	// 3. raise Exception
+	vm->exc = v[1].cls;
+	vm->exc_message = mrbc_nil_value();
       } else {
-	      // case 2. raise "param"
-	      mrbc_incref( &v[1] );
-	      vm->exc = mrbc_class_runtimeerror;
-	      vm->exc_message = v[1];
+	// 2. raise "param"
+	mrbc_incref( &v[1] );
+	vm->exc = mrbc_class_runtimeerror;
+	vm->exc_message = v[1];
       }
     } else if( argc == 2 ){
-      // case 4. raise Exception, "param"
+      // 4. raise Exception, "param"
       mrbc_incref( &v[2] );
       vm->exc = v[1].cls;
       vm->exc_message = v[2];
@@ -308,8 +311,48 @@ static void c_object_raise(struct VM *vm, mrbc_value v[], int argc)
     // in exception
   }
 
+  // do nothing if no rescue, no ensure
+  if( vm->exception_tail == NULL ){
+    return;
+  }
+
   // NOT to return to OP_SEND
   mrbc_pop_callinfo(vm);
+
+  mrbc_callinfo *callinfo = vm->exception_tail;
+  if( callinfo != NULL ){
+    if( callinfo->method_id == 0x7fff ){
+      // "rescue"
+      // jump to rescue
+      vm->exception_tail = callinfo->prev;
+      vm->current_regs = callinfo->current_regs;
+      vm->pc_irep = callinfo->pc_irep;
+      vm->inst = callinfo->inst;
+      vm->target_class = callinfo->target_class;
+      mrbc_free(vm, callinfo);
+      callinfo = vm->exception_tail;
+    } else {
+      // "ensure"
+      // jump to ensure
+      vm->exception_tail = callinfo->prev;
+      vm->current_regs = callinfo->current_regs;
+      vm->pc_irep = callinfo->pc_irep;
+      vm->inst = callinfo->inst;
+      vm->target_class = callinfo->target_class;
+      mrbc_free(vm, callinfo);
+      //
+      callinfo = vm->exception_tail;
+      if( callinfo != NULL ){
+	vm->exception_tail = callinfo->prev;
+	callinfo->prev = vm->callinfo_tail;
+	vm->callinfo_tail = callinfo;
+      }
+    }
+  }
+  if( callinfo == NULL ){
+    vm->exc_pending = vm->exc;
+    vm->exc = 0;
+  }
 }
 
 
@@ -915,3 +958,68 @@ static void c_false_to_s(struct VM *vm, mrbc_value v[], int argc)
 #endif
 */
 #include "method_table_false.h"
+
+
+
+//================================================================
+/*! Run mrblib, which is mruby bytecode
+*/
+static void mrbc_run_mrblib(const uint8_t bytecode[])
+{
+  // instead of mrbc_vm_open()
+  mrbc_vm *vm = mrbc_alloc( 0, sizeof(mrbc_vm) );
+  if( !vm ) return;	// ENOMEM
+  memset(vm, 0, sizeof(mrbc_vm));
+
+  mrbc_load_mrb(vm, bytecode);
+  mrbc_vm_begin(vm);
+  mrbc_vm_run(vm);
+
+  // not necessary to call mrbc_vm_end()
+
+  // instead of mrbc_vm_close()
+  mrbc_raw_free( vm );
+}
+
+
+
+//================================================================
+/*! initialize all classes.
+ */
+void mrbc_init_class(void)
+{
+  extern const uint8_t mrblib_bytecode[];
+  mrbc_class *mrbc_init_class_symbol(struct VM *vm);
+  mrbc_class *mrbc_init_class_fixnum(struct VM *vm);
+  mrbc_class *mrbc_init_class_float(struct VM *vm);
+  mrbc_class *mrbc_init_class_math(struct VM *vm);
+  mrbc_class *mrbc_init_class_string(struct VM *);
+  mrbc_class *mrbc_init_class_array(struct VM *);
+  mrbc_class *mrbc_init_class_range(struct VM *);
+  mrbc_class *mrbc_init_class_hash(struct VM *);
+  void mrbc_init_class_exception(struct VM *);
+
+
+  mrbc_class_object =	mrbc_init_class_object(0);
+  mrbc_class_proc =	mrbc_init_class_proc(0);
+  mrbc_class_nil =	mrbc_init_class_nil(0);
+  mrbc_class_true =	mrbc_init_class_true(0);
+  mrbc_class_false =	mrbc_init_class_false(0);
+  mrbc_class_symbol =	mrbc_init_class_symbol(0);
+  mrbc_class_fixnum =	mrbc_init_class_fixnum(0);
+#if MRBC_USE_FLOAT
+  mrbc_class_float =	mrbc_init_class_float(0);
+#if MRBC_USE_MATH
+  mrbc_class_math =	mrbc_init_class_math(0);
+#endif
+#endif
+#if MRBC_USE_STRING
+  mrbc_class_string =	mrbc_init_class_string(0);
+#endif
+  mrbc_class_array =	mrbc_init_class_array(0);
+  mrbc_class_range =	mrbc_init_class_range(0);
+  mrbc_class_hash =	mrbc_init_class_hash(0);
+  mrbc_init_class_exception(0);
+
+  mrbc_run_mrblib(mrblib_bytecode);
+}
