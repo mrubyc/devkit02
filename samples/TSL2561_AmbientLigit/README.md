@@ -11,7 +11,7 @@ to Grove connector; Seeed studio 101020030
 
 https://www.seeedstudio.com/Grove-Digital-Light-Sensor-TSL2561.html
 
-<img src="">
+<img src="https://github.com/mrubyc/devkit02/raw/main/samples/TSL2561_AmbientLigit/img/101020030.jpg">
 
 
 
