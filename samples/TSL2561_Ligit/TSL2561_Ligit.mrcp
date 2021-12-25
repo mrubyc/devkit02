@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mrcp name="TSL2561_Ligit">
+  <version>1.0</version>
+  <timestamp>2021-12-25T17:08:11</timestamp>
+  <files>
+    <file name="main.rb">
+      <type>2</type>
+      <editing>false</editing>
+      <mark/>
+    </file>
+  </files>
+</mrcp>
