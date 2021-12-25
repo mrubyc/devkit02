@@ -31,6 +31,12 @@ and I/O API proposal
 https://github.com/mrubyc/dev/blob/master/mrubyc_io_api.md
 
 
+### mruby/c sample code.
+
+Some sample programs that mainly control sensors.
+
+https://github.com/mrubyc/devkit02/tree/main/samples
+
 
 ## LICENSE
 
