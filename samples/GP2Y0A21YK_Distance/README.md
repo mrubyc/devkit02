@@ -20,3 +20,5 @@ Connect to the glove analog connector with a handmade bulk cable.
 3. Also, when the voltage exceeds the threshold, LED1 is turned on to indicate that there is an object nearby. 
 
 ## Demo
+
+https://user-images.githubusercontent.com/16683312/147382188-d99ca31b-5f03-4c57-91c4-038a6deff579.mp4
