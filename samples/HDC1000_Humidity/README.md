@@ -26,3 +26,5 @@ Connect to the glove I2C connector.
 2. Reads temperature and humidity about once every second.
 
 ## Demo
+
+https://user-images.githubusercontent.com/16683312/148039185-1c55f5a6-92fc-44ba-bbd0-9b33a6fce8e5.mp4
