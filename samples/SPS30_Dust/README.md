@@ -2,7 +2,7 @@
 
 PM2.5 Sensor for HVAC and air quality applications
 
-https://github.com/mrubyc/devkit02/raw/main/samples/SPS30_Dust/img/SPS30.jpg
+<img src="https://github.com/mrubyc/devkit02/raw/main/samples/SPS30_Dust/img/SPS30.jpg">
 
 https://sensirion.com/products/catalog/SPS30/
 
@@ -19,3 +19,5 @@ Connect to the glove I2C connector with a handmade bulk cable.
 3. Display each measured value on the LCD panel (with scroll).
 
 ## Demo
+
+https://user-images.githubusercontent.com/16683312/149897055-d63019b6-a0ee-472d-b40c-353299b3132d.mp4
