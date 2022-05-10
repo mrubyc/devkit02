@@ -19,7 +19,6 @@
 
 #include "mrubyc.h"
 #include "lcdc.h"
-#include "uart2.h"
 #include "c_i2c.h"
 #include "c_uart.h"
 #include "c_spi.h"
@@ -88,7 +87,6 @@ const uint8_t CYCODE mruby_bytecode[MRBC_SIZE_IREP_STRAGE] = {
 0x5f,0x70,0x75,0x74,0x73,0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
 };
 
-extern UART_HANDLE uh[];
 
 
 //================================================================
@@ -128,8 +126,11 @@ int hal_write(int fd, const void *buf, int nbytes)
   return nbytes;
 
 #else
-
-  return uart_write( &uh[0], buf, nbytes );
+  const char *p = buf;
+  for( int i = 0; i < nbytes; i++ ) {
+    CONS_PutChar( *p++ );
+  }
+  return nbytes;
 #endif
 }
 
@@ -643,6 +644,7 @@ static void mrubyc_start(void)
 }
 
 
+
 //================================================================
 /*! main
 */
@@ -660,7 +662,7 @@ int main()
   PWM0_Start();
   PWM1_Start();
   PWM1_SetCompareMode(PWM1__B_PWM__LESS_THAN);
-  UART_0_Start();
+  CONS_Start();
 
   mrbc_monitor_init();
   lcd_init();
@@ -671,8 +673,8 @@ int main()
 
   // init mruby/c vm's
   mrbc_init(memory_pool, MEMORY_SIZE);
-  mrbc_init_class_uart(0);	// -DMRBC_NUM_UART=2
   mrbc_init_class_i2c(0);
+  mrbc_init_class_uart(0);	// -DMRBC_NUM_UART=2
   mrbc_init_class_spi(0);
   mrbc_init_class_eeprom(0);
   define_other_device_methods();
