@@ -431,7 +431,7 @@ int mrbc_monitor_run(void)
 
     if( strcmp(token, "execute") == 0 ) {
       usbuart_put_string("+OK Execute mruby/c.\r\n");
-      return 0;	// to execute VM.
+      break;
     }
 
     if( strcmp(token, "clear") == 0 ) {
@@ -480,4 +480,10 @@ int mrbc_monitor_run(void)
   DONE:
     usbuart_clear();
   }
+
+  for( int i = 0; i < 10; i++ ) {
+    usbuart_event();
+    CyDelay(10);
+  }
+  return 0;	// to execute VM.
 }
