@@ -3,8 +3,8 @@
   mruby/c value definitions
 
   <pre>
-  Copyright (C) 2015-2020 Kyushu Institute of Technology.
-  Copyright (C) 2015-2020 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015- Kyushu Institute of Technology.
+  Copyright (C) 2015- Shimane IT Open-Innovation Center.
 
   This file is distributed under BSD 3-Clause License.
 
@@ -12,16 +12,19 @@
   </pre>
 */
 
-
 /***** Feature test switches ************************************************/
 /***** System headers *******************************************************/
+//@cond
 #include "vm_config.h"
 #include <string.h>
 #include <assert.h>
+//@endcond
 
 /***** Local headers ********************************************************/
 #include "value.h"
+#include "symbol.h"
 #include "class.h"
+#include "error.h"
 #include "c_string.h"
 #include "c_range.h"
 #include "c_array.h"
@@ -37,19 +40,22 @@
 //================================================================
 /*! function table for object delete.
 
-  (note) need same order as mrb_vtype.
+  @note must be same order as mrbc_vtype.
+  @see mrbc_vtype in value.h
 */
 void (* const mrbc_delfunc[])(mrbc_value *) = {
-  mrbc_instance_delete,
-  mrbc_proc_delete,
-  mrbc_array_delete,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  mrbc_instance_delete,		// MRBC_TT_OBJECT    = 8,
+  mrbc_proc_delete,		// MRBC_TT_PROC	     = 9,
+  mrbc_array_delete,		// MRBC_TT_ARRAY     = 10,
 #if MRBC_USE_STRING
-  mrbc_string_delete,
+  mrbc_string_delete,		// MRBC_TT_STRING    = 11,
 #else
   NULL,
 #endif
-  mrbc_range_delete,
-  mrbc_hash_delete,
+  mrbc_range_delete,		// MRBC_TT_RANGE     = 12,
+  mrbc_hash_delete,		// MRBC_TT_HASH	     = 13,
+  mrbc_exception_delete,	// MRBC_TT_EXCEPTION = 14,
 };
 
 
@@ -69,19 +75,19 @@ void (* const mrbc_delfunc[])(mrbc_value *) = {
 int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2)
 {
 #if MRBC_USE_FLOAT
-  mrbc_float d1, d2;
+  mrbc_float_t d1, d2;
 #endif
 
   // if TT_XXX is different
   if( mrbc_type(*v1) != mrbc_type(*v2) ) {
 #if MRBC_USE_FLOAT
     // but Numeric?
-    if( mrbc_type(*v1) == MRBC_TT_FIXNUM && mrbc_type(*v2) == MRBC_TT_FLOAT ) {
+    if( mrbc_type(*v1) == MRBC_TT_INTEGER && mrbc_type(*v2) == MRBC_TT_FLOAT ) {
       d1 = v1->i;
       d2 = v2->d;
       goto CMP_FLOAT;
     }
-    if( mrbc_type(*v1) == MRBC_TT_FLOAT && mrbc_type(*v2) == MRBC_TT_FIXNUM ) {
+    if( mrbc_type(*v1) == MRBC_TT_FLOAT && mrbc_type(*v2) == MRBC_TT_INTEGER ) {
       d1 = v1->d;
       d2 = v2->i;
       goto CMP_FLOAT;
@@ -103,9 +109,17 @@ int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2)
   case MRBC_TT_TRUE:
     return 0;
 
-  case MRBC_TT_FIXNUM:
-  case MRBC_TT_SYMBOL:
-    return mrbc_fixnum(*v1) - mrbc_fixnum(*v2);
+  case MRBC_TT_INTEGER:
+    return mrbc_integer(*v1) - mrbc_integer(*v2);
+
+  case MRBC_TT_SYMBOL: {
+    const char *str1 = mrbc_symid_to_str(mrbc_symbol(*v1));
+    const char *str2 = mrbc_symid_to_str(mrbc_symbol(*v2));
+    int diff = strlen(str1) - strlen(str2);
+    int len = diff < 0 ? strlen(str1) : strlen(str2);
+    int res = memcmp(str1, str2, len);
+    return (res != 0) ? res : diff;
+  }
 
 #if MRBC_USE_FLOAT
   case MRBC_TT_FLOAT:
@@ -117,7 +131,7 @@ int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2)
   case MRBC_TT_CLASS:
   case MRBC_TT_OBJECT:
   case MRBC_TT_PROC:
-    return -1 + (v1->proc == v2->proc) + (v1->proc > v2->proc)*2;
+    return (v1->cls > v2->cls) * 2 - (v1->cls != v2->cls);
 
   case MRBC_TT_ARRAY:
     return mrbc_array_compare( v1, v2 );
@@ -144,6 +158,7 @@ int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2)
 }
 
 
+#if defined(MRBC_ALLOC_VMID)
 //================================================================
 /*! clear vm id
 
@@ -152,6 +167,8 @@ int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2)
 void mrbc_clear_vm_id(mrbc_value *v)
 {
   switch( mrbc_type(*v) ) {
+  case MRBC_TT_OBJECT:	mrbc_instance_clear_vm_id(v);	break;
+  case MRBC_TT_PROC:	mrbc_proc_clear_vm_id(v);	break;
   case MRBC_TT_ARRAY:	mrbc_array_clear_vm_id(v);	break;
 #if MRBC_USE_STRING
   case MRBC_TT_STRING:	mrbc_string_clear_vm_id(v);	break;
@@ -164,6 +181,7 @@ void mrbc_clear_vm_id(mrbc_value *v)
     break;
   }
 }
+#endif
 
 
 //================================================================
@@ -173,7 +191,7 @@ void mrbc_clear_vm_id(mrbc_value *v)
   @param  base	n base.
   @return	result.
 */
-mrbc_int mrbc_atoi( const char *s, int base )
+mrbc_int_t mrbc_atoi( const char *s, int base )
 {
   int ret = 0;
   int sign = 0;
@@ -215,4 +233,27 @@ mrbc_int mrbc_atoi( const char *s, int base )
   if( sign ) ret = -ret;
 
   return ret;
+}
+
+
+//================================================================
+/*! string copy
+
+  @param  dest		destination buffer.
+  @param  destsize	buffer size.
+  @param  src		source.
+  @return int		number of bytes copied.
+*/
+int mrbc_strcpy( char *dest, int destsize, const char *src )
+{
+  int n = destsize;
+  if( n <= 0 ) return 0;
+
+  while( --n != 0 ) {
+    if( (*dest++ = *src++) == 0 ) goto RETURN;
+  }
+  *dest = 0;
+
+ RETURN:
+  return destsize - n - 1;
 }

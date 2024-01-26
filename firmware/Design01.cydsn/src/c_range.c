@@ -1,25 +1,41 @@
 /*! @file
   @brief
-  mruby/c Range object
+  mruby/c Range class
 
   <pre>
-  Copyright (C) 2015-2020 Kyushu Institute of Technology.
-  Copyright (C) 2015-2020 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015- Kyushu Institute of Technology.
+  Copyright (C) 2015- Shimane IT Open-Innovation Center.
 
   This file is distributed under BSD 3-Clause License.
 
   </pre>
 */
 
-#include "vm_config.h"
-#include "value.h"
-#include "alloc.h"
-#include "class.h"
-#include "c_range.h"
-#include "c_string.h"
-#include "console.h"
-#include "opcode.h"
 
+/***** Feature test switches ************************************************/
+/***** System headers *******************************************************/
+//@cond
+#include "vm_config.h"
+//@endcond
+
+/***** Local headers ********************************************************/
+#include "alloc.h"
+#include "value.h"
+#include "symbol.h"
+#include "class.h"
+#include "c_string.h"
+#include "c_range.h"
+#include "console.h"
+
+/***** Constat values *******************************************************/
+/***** Macros ***************************************************************/
+/***** Typedefs *************************************************************/
+/***** Function prototypes **************************************************/
+/***** Local variables ******************************************************/
+/***** Global variables *****************************************************/
+/***** Signal catching functions ********************************************/
+/***** Local functions ******************************************************/
+/***** Global functions *****************************************************/
 
 //================================================================
 /*! constructor
@@ -60,6 +76,7 @@ void mrbc_range_delete(mrbc_value *v)
 }
 
 
+#if defined(MRBC_ALLOC_VMID)
 //================================================================
 /*! clear vm_id
 
@@ -71,6 +88,7 @@ void mrbc_range_clear_vm_id(mrbc_value *v)
   mrbc_clear_vm_id( &v->range->first );
   mrbc_clear_vm_id( &v->range->last );
 }
+#endif
 
 
 //================================================================
@@ -102,7 +120,7 @@ int mrbc_range_compare(const mrbc_value *v1, const mrbc_value *v2)
 */
 static void c_range_equal3(struct VM *vm, mrbc_value v[], int argc)
 {
-  if( v[0].tt == MRBC_TT_CLASS ) {
+  if( mrbc_type(v[0]) == MRBC_TT_CLASS ) {
     mrbc_value result = mrbc_send( vm, v, argc, &v[1], "kind_of?", 1, &v[0] );
     SET_RETURN( result );
     return;
@@ -154,10 +172,15 @@ static void c_range_exclude_end(struct VM *vm, mrbc_value v[], int argc)
 
 #if MRBC_USE_STRING
 //================================================================
-/*! (method) inspect
+/*! (method) inspect, to_s
 */
 static void c_range_inspect(struct VM *vm, mrbc_value v[], int argc)
 {
+  if( v[0].tt == MRBC_TT_CLASS ) {
+    v[0] = mrbc_string_new_cstr(vm, mrbc_symid_to_str( v[0].cls->sym_id ));
+    return;
+  }
+
   mrbc_value ret = mrbc_string_new(vm, NULL, 0);
   if( !ret.string ) goto RETURN_NIL;		// ENOMEM
 
@@ -182,8 +205,7 @@ static void c_range_inspect(struct VM *vm, mrbc_value v[], int argc)
 /* MRBC_AUTOGEN_METHOD_TABLE
 
   CLASS("Range")
-  FILE("method_table_range.h")
-  FUNC("mrbc_init_class_range")
+  FILE("_autogen_class_range.h")
 
   METHOD("===",		c_range_equal3 )
   METHOD("first",	c_range_first )
@@ -194,4 +216,4 @@ static void c_range_inspect(struct VM *vm, mrbc_value v[], int argc)
   METHOD("to_s",	c_range_inspect )
 #endif
 */
-#include "method_table_range.h"
+#include "_autogen_class_range.h"

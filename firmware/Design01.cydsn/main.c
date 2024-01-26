@@ -573,15 +573,15 @@ static void c_debugprint(mrbc_vm *vm, mrbc_value v[], int argc)
 
   pqall();
 
-  int total, used, free, fragment;
-  mrbc_alloc_statistics( &total, &used, &free, &fragment );
+  struct MRBC_ALLOC_STATISTICS ms;
+  mrbc_alloc_statistics( &ms );
   console_printf("Memory total:%d, used:%d, free:%d, fragment:%d\n",
-		 total, used, free, fragment );
+		 ms.total, ms.used, ms.free, ms.fragmentation );
 
-  total = MAX_SYMBOLS_COUNT;
+  int used;
   mrbc_symbol_statistics( &used );
   console_printf("Symbol table: %d/%d %d%% used.\n",
-		 used, total, 100 * used / total );
+		 used, MAX_SYMBOLS_COUNT, 100 * used / MAX_SYMBOLS_COUNT );
 
   hal_enable_irq();
 #endif
@@ -681,9 +681,11 @@ int main()
 
   console_print("\r\n\x1b(B\x1b)B\x1b[0m\x1b[2JStart system.\n");
   lcd_location( 0, 0 );
-  lcd_puts( "mruby/c devkit 02" );
+  lcd_puts("mruby/c devkit 02");
   lcd_location( 1, 5 );
-  lcd_puts( "firm rev 1.0.0" );
+  lcd_puts("firm rev 1.0.0");
+  lcd_location( 2, 5 );
+  lcd_puts("mruby/c ver 3.2");
 
   /*
     main

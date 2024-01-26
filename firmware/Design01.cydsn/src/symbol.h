@@ -3,8 +3,8 @@
   mruby/c Symbol class
 
   <pre>
-  Copyright (C) 2015-2020 Kyushu Institute of Technology.
-  Copyright (C) 2015-2020 Shimane IT Open-Innovation Center.
+  Copyright (C) 2015- Kyushu Institute of Technology.
+  Copyright (C) 2015- Shimane IT Open-Innovation Center.
 
   This file is distributed under BSD 3-Clause License.
 
@@ -14,15 +14,15 @@
 #ifndef MRBC_SRC_SYMBOL_H_
 #define MRBC_SRC_SYMBOL_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /***** Feature test switches ************************************************/
 /***** System headers *******************************************************/
 /***** Local headers ********************************************************/
 #include "value.h"
+#include "_autogen_builtin_symbol.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /***** Constant values ******************************************************/
 /***** Macros ***************************************************************/
 /***** Typedefs *************************************************************/
@@ -32,7 +32,10 @@ void mrbc_cleanup_symbol(void);
 mrbc_sym mrbc_str_to_symid(const char *str);
 const char *mrbc_symid_to_str(mrbc_sym sym_id);
 mrbc_sym mrbc_search_symid(const char *str);
+void make_nested_symbol_s(char *buf, mrbc_sym id1, mrbc_sym id2);
+void mrbc_separate_nested_symid(mrbc_sym sym_id, mrbc_sym *id1, mrbc_sym *id2);
 mrbc_value mrbc_symbol_new(struct VM *vm, const char *str);
+void mrbc_debug_dump_symbol(void);
 void mrbc_symbol_statistics(int *total_used);
 
 
@@ -44,6 +47,21 @@ void mrbc_symbol_statistics(int *total_used);
 static inline const char * mrbc_symbol_cstr(const mrbc_value *v)
 {
   return mrbc_symid_to_str(v->i);
+}
+
+
+//================================================================
+/*! is nested symbol ID ?
+
+  @param  sym_id	target symbol ID.
+  @return int		result.
+  @see	make_nested_symbol_s
+*/
+static inline int mrbc_is_nested_symid(mrbc_sym sym_id)
+{
+  const char *s = mrbc_symid_to_str(sym_id);
+
+  return ('0' <= s[0] && s[0] <= ('9'+6));
 }
 
 
